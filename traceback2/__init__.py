@@ -391,10 +391,10 @@ class StackSummary(list):
         result = []
         for frame in self:
             row = []
-            row.append(u('  File "{0}", line {1}, in {2}\n').format(
+            row.append(u('  File "{}", line {}, in {}\n').format(
                 _some_fs_str(frame.filename), frame.lineno, frame.name))
             if frame.line:
-                row.append(u('    {0}\n').format(frame.line.strip()))
+                row.append(u('    {}\n').format(frame.line.strip()))
             if frame.locals:
                 for name, value in sorted(frame.locals.items()):
                     row.append(u('    {name} = {value}\n').format(name=name, value=value))
@@ -540,7 +540,7 @@ class TracebackException:
         # It was a syntax error; show exactly where the problem was found.
         filename = _some_fs_str(self.filename) or u("<string>")
         lineno = str(self.lineno) or u('?')
-        yield u('  File "{0}", line {1}\n').format(filename, lineno)
+        yield u('  File "{}", line {}\n').format(filename, lineno)
 
         badline = None
         if self.text is not None:
@@ -557,16 +557,16 @@ class TracebackException:
                 badline = self.text
         offset = self.offset
         if badline is not None:
-            yield u('    {0}\n').format(badline.strip())
+            yield u('    {}\n').format(badline.strip())
             if offset is not None:
                 caretspace = badline.rstrip('\n')
                 offset = min(len(caretspace), offset) - 1
                 caretspace = caretspace[:offset].lstrip()
                 # non-space whitespace (likes tabs) must be kept for alignment
                 caretspace = ((c.isspace() and c or ' ') for c in caretspace)
-                yield u('    {0}^\n').format(''.join(caretspace))
+                yield u('    {}^\n').format(''.join(caretspace))
         msg = self.msg or u("<no detail available>")
-        yield u("{0}: {1}\n").format(stype, msg)
+        yield u("{}: {}\n").format(stype, msg)
 
     def format(self, chain=True):
         """Format the exception.

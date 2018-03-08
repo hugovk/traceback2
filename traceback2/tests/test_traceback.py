@@ -188,9 +188,9 @@ class SyntaxTracebackCases(testtools.TestCase):
             with fixtures.TempDir() as d:
                 TESTFN = d.path + '/fname'
                 output = io.open(TESTFN, "w", encoding=charset)
-                output.write(u("""{0}if 1:
+                output.write(u("""{}if 1:
                     import traceback;
-                    raise RuntimeError('{1}')
+                    raise RuntimeError('{}')
                     """).format(firstlines, message))
                 output.close()
                 process = subprocess.Popen([sys.executable, TESTFN],
@@ -206,20 +206,20 @@ class SyntaxTracebackCases(testtools.TestCase):
             # and we just decoded them with the output_encoding.
             message_ascii = encoded_message.decode(output_encoding)
 
-            err_line = u("raise RuntimeError('{0}')").format(message_ascii)
-            err_msg = u("RuntimeError: {0}").format(message_ascii)
+            err_line = u("raise RuntimeError('{}')").format(message_ascii)
+            err_msg = u("RuntimeError: {}").format(message_ascii)
 
             if platform.python_implementation() == 'PyPy':
                 # PyPy includes its own top level app_main.py in the traceback.
                 del stdout[1]
             self.assertIn(("line %s" % lineno), stdout[1],
-                "Invalid line number: {0!r} instead of {1}".format(
+                "Invalid line number: {!r} instead of {}".format(
                     stdout[1], lineno))
             self.assertTrue(stdout[2].endswith(err_line),
-                "Invalid traceback line: {0!r} instead of {1!r}".format(
+                "Invalid traceback line: {!r} instead of {!r}".format(
                     stdout[2], err_line))
             self.assertTrue(stdout[3] == err_msg,
-                "Invalid error message: {0!r} instead of {1!r}".format(
+                "Invalid error message: {!r} instead of {!r}".format(
                     stdout[3], err_msg))
 
         do_test("", "foo", "ascii", 3, output_encoding)
@@ -230,11 +230,11 @@ class SyntaxTracebackCases(testtools.TestCase):
                 text = u("\u4E02\u5100")
             else:
                 text = u("h\xe9 ho")
-            do_test("# coding: {0}\n".format(charset),
+            do_test("# coding: {}\n".format(charset),
                     text, charset, 4, output_encoding)
-            do_test("#!shebang\n# coding: {0}\n".format(charset),
+            do_test("#!shebang\n# coding: {}\n".format(charset),
                     text, charset, 5, output_encoding)
-            do_test(" \t\f\n# coding: {0}\n".format(charset),
+            do_test(" \t\f\n# coding: {}\n".format(charset),
                     text, charset, 5, output_encoding)
         # Issue #18960: coding spec should has no effect
         # (Fixed in 3.4)
