@@ -1,7 +1,6 @@
 """Extract, format and print information about Python stack traces."""
 
 import sys
-import operator
 
 import linecache2 as linecache
 from six import u, PY2
