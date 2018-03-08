@@ -18,14 +18,14 @@ try:
 except ImportError:
 # support raise_from on 3.x:
 # submitted to six: https://bitbucket.org/gutworth/six/issue/102/raise-foo-from-bar-is-a-syntax-error-on-27
-    if sys.version_info[:2] > (3, 1):
+    if sys.version_info.major >= 3:
         six.exec_("""def raise_from(value, from_value):
         raise value from from_value
     """)
     else:
         def raise_from(value, from_value):
             raise value
-import unittest2 as unittest
+import unittest
 import testtools
 from testtools.matchers import DocTestMatches, Equals, MatchesAny
 
@@ -238,7 +238,7 @@ class SyntaxTracebackCases(testtools.TestCase):
                     text, charset, 5, output_encoding)
         # Issue #18960: coding spec should has no effect
         # (Fixed in 3.4)
-        if sys.version_info[:2] > (3, 3):
+        if sys.version_info.major >= 3:
             do_test(
                 "0\n# coding: GBK\n", u("h\xe9 ho"), 'utf-8', 5,
                 output_encoding)
@@ -375,7 +375,7 @@ class BaseExceptionReportingTests:
         # < 3 show as exceptions.ZeroDivisionError.
         self.assertIn('ZeroDivisionError', lines[3])
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 2), "Only applies to 3.2+")
+    @unittest.skipIf(sys.version_info.major == 2, "Only applies to Python 3")
     def test_cause(self):
         def inner_raise():
             try:
@@ -390,7 +390,7 @@ class BaseExceptionReportingTests:
         self.check_zero_div(blocks[0])
         self.assertIn('inner_raise() # Marker', blocks[2])
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 2), "Only applies to 3.2+")
+    @unittest.skipIf(sys.version_info.major == 2, "Only applies to Python 3")
     def test_context(self):
         def inner_raise():
             try:
@@ -405,7 +405,7 @@ class BaseExceptionReportingTests:
         self.check_zero_div(blocks[0])
         self.assertIn('inner_raise() # Marker', blocks[2])
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 3), "Only applies to 3.3+")
+    @unittest.skipIf(sys.version_info.major == 2, "Only applies to Python 3")
     def test_context_suppression(self):
         try:
             try:
@@ -424,7 +424,7 @@ Traceback (most recent call last):
 ZeroDivisionError
 """, doctest.ELLIPSIS))
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 2), "Only applies to 3.2+")
+    @unittest.skipIf(sys.version_info.major == 2, "Only applies to Python 3")
     def test_cause_and_context(self):
         # When both a cause and a context are set, only the cause should be
         # displayed and the context should be muted.
@@ -445,7 +445,7 @@ ZeroDivisionError
         self.check_zero_div(blocks[0])
         self.assertIn('inner_raise() # Marker', blocks[2])
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 2), "Only applies to 3.2+")
+    @unittest.skipIf(sys.version_info.major == 2, "Only applies to Python 3")
     def test_cause_recursive(self):
         def inner_raise():
             try:
@@ -524,7 +524,7 @@ class MiscTracebackCases(unittest.TestCase):
         traceback.clear_frames(tb)
 
         # Local variable dict should now be empty (on Python 3.4+)
-        if sys.version_info[:2] > (3, 3):
+        if sys.version_info.major >= 3:
             self.assertEqual({}, inner_frame.f_locals)
 
 
@@ -679,7 +679,7 @@ class TestTracebackException(unittest.TestCase):
         self.assertEqual(exc_info[0], exc.exc_type)
         self.assertEqual(str(exc_info[1]), str(exc))
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 0), "Only applies to 3+")
+    @unittest.skipIf(sys.version_info.major == 2, "Only applies to Python 3")
     def test_from_exception(self):
         # Check all the parameters are accepted.
         def foo():
@@ -702,7 +702,7 @@ class TestTracebackException(unittest.TestCase):
         self.assertEqual(exc_info[0], exc.exc_type)
         self.assertEqual(str(exc_info[1]), str(exc))
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 2), "Only applies to 3.2+")
+    @unittest.skipIf(sys.version_info.major == 2, "Only applies to Python 3")
     def test_cause(self):
         try:
             try:
@@ -726,7 +726,7 @@ class TestTracebackException(unittest.TestCase):
         self.assertEqual(exc_info[0], exc.exc_type)
         self.assertEqual(str(exc_info[1]), str(exc))
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 2), "Only applies to 3.2+")
+    @unittest.skipIf(sys.version_info.major == 2, "Only applies to Python 3")
     def test_context(self):
         try:
             try:
@@ -840,7 +840,7 @@ class TestTracebackException(unittest.TestCase):
             u('SyntaxError: uh oh\n')],
             list(exc.format()))
 
-    @unittest.skipUnless(sys.version_info[0] < 3, "Applies to 2.x only.")
+    @unittest.skipUnless(sys.version_info.major == 2, "Applies to Python 2 only.")
     @unittest.skipIf(sys.getfilesystemencoding()=='ANSI_X3.4-1968',
                      'Requires non-ascii fs encoding')
     def test_format_unicode_filename(self):
@@ -872,7 +872,7 @@ class TestTracebackException(unittest.TestCase):
             u('SyntaxError: uh oh\n')],
             list(exc.format()))
 
-    @unittest.skipUnless(sys.version_info[0] < 3, "Applies to 2.x only.")
+    @unittest.skipUnless(sys.version_info.major == 2, "Applies to Python 2 only.")
     def test_format_bad_filename(self):
         # Filenames in Python2 may be bytestrings that will fail to implicit
         # decode.
